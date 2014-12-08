@@ -3,20 +3,33 @@
 $strokes = {:fly => 0, :back => 1, :breast => 2, :free => 3}
 $strokes_lookup = $strokes.invert
 
+def LapsToLength(numLaps)
+  poolLength = 25
+  return numLaps * poolLength
+end
 
-def GenSet(lapsPerRep, maxLaps, lapSet)
+
+def GenSymSet(lapsPerRep, maxLaps, lapSet)
   numReps = (maxLaps / lapsPerRep).floor
 
   set = lapSet.repeated_permutation(lapsPerRep).to_a
-  return set
 
-  #To-Do: implement total distance restrictions
+  #Make this more efficient later, feeling lazy AF
+  while LapsToLength(lapsPerRep * set.size) > maxLaps
+    set.pop
+  end
+
+  return set
+end
+
+def GenBuildSet(growRate, maxLaps, lapSet)
+  #Spec this out
 end
 
 def QuickSet
   fiveHundredFree = Array.new(20, $strokes[:free])
   basicWarmup = [fiveHundredFree]
-  techWarmup = GenSet(3, 500, [$strokes[:free], $strokes[:back]])
+  techWarmup = GenSymSet(3, 500, [$strokes[:free], $strokes[:back]])
   warmup = [basicWarmup, techWarmup]
 
   hundredFree = Array.new(4, $strokes[:free])
@@ -38,12 +51,12 @@ def SetToString(set)
     if lap == last_lap or last_lap == nil
       lap_count += 1
     else
-      setString += (lap_count * 25).to_s + " " + $strokes_lookup[last_lap].to_s
+      setString += LapsToLength(lap_count).to_s + " " + $strokes_lookup[last_lap].to_s
       lap_count = 1
     end
     last_lap = lap
   end
-  setString += (lap_count * 25).to_s + " " + $strokes_lookup[last_lap].to_s
+  setString += LapsToLength(lap_count).to_s + " " + $strokes_lookup[last_lap].to_s
   return setString
 end
 
