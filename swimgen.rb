@@ -3,11 +3,17 @@
 $strokes = {:fly => 0, :back => 1, :breast => 2, :free => 3}
 $strokes_lookup = $strokes.invert
 
+$pool_lengths = {:scy => 25, :scm => 25, :lcm => 50}
+
 def LapsToLength(numLaps)
   poolLength = 25
   return numLaps * poolLength
 end
 
+def LengthToLaps(length)
+  poolLength = 25
+  return length / poolLength
+end
 
 def GenSymSet(lapsPerRep, maxLaps, lapSet)
   numReps = (maxLaps / lapsPerRep).floor
@@ -22,8 +28,24 @@ def GenSymSet(lapsPerRep, maxLaps, lapSet)
   return set
 end
 
-def GenBuildSet(growRate, maxLaps, lapSet)
-  #Spec this out
+#THIS NEEDS TO BE TESTED
+def GenBuildSet(increment, initialLaps, maxLaps, lapSet)
+  #Spec this out: (12/9/14) How do I specify how to assign from the lap set?
+
+  #Make the stroke dynamic later
+  initialRep = Array.new(initialLaps, $strokes[:free])
+  buildSet = [initialRep]
+  currentLaps = initialLaps
+  currentLevel = initialLaps
+
+  while currentLaps < maxLaps
+    currentLevel += increment
+    currentLaps += currentLevel
+    buildSet.push(Array.new(currentLevel, $strokes[:free]))
+  end
+
+  return buildSet
+
 end
 
 def QuickSet
@@ -34,7 +56,8 @@ def QuickSet
 
   hundredFree = Array.new(4, $strokes[:free])
   mainSet = Array.new(10, hundredFree)
-  main = [mainSet]
+  otherSet = GenBuildSet(2, 2, 20, [$strokes[:free], $strokes[:back]])
+  main = [mainSet, otherSet]
 
   warmDownSet = [fiveHundredFree]
   coolDown = [warmDownSet]
@@ -51,34 +74,20 @@ def SetToString(set)
     if lap == last_lap or last_lap == nil
       lap_count += 1
     else
-      setString += LapsToLength(lap_count).to_s + " " + $strokes_lookup[last_lap].to_s
+      setString += " " + LapsToLength(lap_count).to_s + " " + $strokes_lookup[last_lap].to_s
       lap_count = 1
     end
     last_lap = lap
   end
-  setString += LapsToLength(lap_count).to_s + " " + $strokes_lookup[last_lap].to_s
+  setString += " " + LapsToLength(lap_count).to_s + " " + $strokes_lookup[last_lap].to_s
   return setString
 end
 
 def PrintSet(set)
   puts "Warm Up: "
   set[:warmup].each do |warmupSet|
-    #puts "\t" + (subset.size * 25).to_s + "yds:"
-    puts "\t" + warmupSet.size.to_s + " * "
     warmupSet.each do |subset|
-      puts "\t\t" + (subset.size * 25).to_s + ": "
-      last_lap = nil
-      lap_count = 0
-      subset.each do |lap|
-        if lap == last_lap or last_lap == nil
-          lap_count += 1
-        else
-          puts "\t\t\t" + (lap_count * 25).to_s + " " + $strokes_lookup[last_lap].to_s
-          count = 1
-        end
-        last_lap = lap
-      end
-      puts "\t\t\t" + (lap_count * 25).to_s + " " + $strokes_lookup[last_lap].to_s
+      puts "\t\t" + (subset.size * 25).to_s + ": " + SetToString(subset)
     end
   end
 
