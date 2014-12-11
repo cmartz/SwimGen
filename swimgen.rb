@@ -4,17 +4,59 @@ $strokes = {:fly => 0, :back => 1, :breast => 2, :free => 3}
 $strokes_lookup = $strokes.invert
 
 $pool_lengths = {:scy => 25, :scm => 25, :lcm => 50}
+$pool_length = nil
 
+# => Inputs:
+# => Outputs:
+# => Purpose:
+def InitPoolLength(length)
+  if length == "scy" or length == nil
+    $pool_length = $pool_lengths[:scy]
+  elsif length == "scm"
+    $pool_length = $pool_lengths[:scm]
+  elsif length == "lcm"
+    $pool_length = $pool_lengths[:lcm]
+  else
+    #Undefined pool length, throw error and abort
+  end
+
+  puts $pool_length
+end
+
+# => Inputs:
+# => Outputs:
+# => Purpose:
+def GetPoolLength
+  return $pool_length
+end
+
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def LapsToLength(numLaps)
-  poolLength = 25
-  return numLaps * poolLength
+  return numLaps * GetPoolLength()
 end
 
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def LengthToLaps(length)
-  poolLength = 25
-  return length / poolLength
+  return length / GetPoolLength()
 end
 
+# => Inputs:
+# => Outputs:
+# => Purpose:
+def InitEngine
+  args = Hash[ ARGV.flat_map{|s| s.scan(/--?([^=\s]+)(?:=(\S+))?/) } ]
+  InitPoolLength(args['pl'])
+end
+
+#########################################################################
+
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def GenSymSet(lapsPerRep, maxLaps, lapSet)
   numReps = (maxLaps / lapsPerRep).floor
 
@@ -29,6 +71,9 @@ def GenSymSet(lapsPerRep, maxLaps, lapSet)
 end
 
 #THIS NEEDS TO BE TESTED
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def GenBuildSet(increment, initialLaps, maxLaps, lapSet)
   #Spec this out: (12/9/14) How do I specify how to assign from the lap set?
 
@@ -48,6 +93,9 @@ def GenBuildSet(increment, initialLaps, maxLaps, lapSet)
 
 end
 
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def QuickSet
   fiveHundredFree = Array.new(20, $strokes[:free])
   basicWarmup = [fiveHundredFree]
@@ -66,6 +114,9 @@ def QuickSet
   return set
 end
 
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def SetToString(set)
   setString = ""
   last_lap = nil
@@ -83,31 +134,35 @@ def SetToString(set)
   return setString
 end
 
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def PrintSet(set)
   puts "Warm Up: "
   set[:warmup].each do |warmupSet|
     warmupSet.each do |subset|
-      puts "\t\t" + (subset.size * 25).to_s + ": " + SetToString(subset)
+      puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
   end
 
   puts "Main Set: "
   set[:main].each do |mainSet|
     mainSet.each do |subset|
-      puts "\t\t" + (subset.size * 25).to_s + ": " + SetToString(subset)
+      puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
   end
 
   puts "Cool Down: "
   set[:cooldown].each do |cooldownSet|
     cooldownSet.each do |subset|
-      puts "\t\t" + (subset.size * 25).to_s + ": " + SetToString(subset)
+      puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
   end
 end
 
+#########################################################################
+InitEngine()
+
 set = QuickSet()
 
 PrintSet(set)
-
-puts Random.rand(10)
