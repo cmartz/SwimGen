@@ -9,6 +9,18 @@ $pool_length = nil
 # => Inputs:
 # => Outputs:
 # => Purpose:
+def InitLapSet(focus)
+  if focus == "swim" or focus == "s"
+  elsif focus == "drill" or focus == "d"
+  elsif focus == "kick" or focus == "k"
+  else
+    #Undefined set focus, throw error and abort
+  end
+end
+
+# => Inputs:
+# => Outputs:
+# => Purpose:
 def InitPoolLength(length)
   if length == "scy" or length == nil
     $pool_length = $pool_lengths[:scy]
@@ -50,13 +62,20 @@ end
 def InitEngine
   args = Hash[ ARGV.flat_map{|s| s.scan(/--?([^=\s]+)(?:=(\S+))?/) } ]
   InitPoolLength(args['pl'])
+  InitLapSet(args['f'])
 end
 
 #########################################################################
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: lapsPerRep - Number of laps in each discrete rep.
+#            maxLaps    - Maximum (or minimum) size of a rep.
+#            lapSet     - The set of laps available for use in reps.
+#
+# => Outputs: A set array.
+#
+# => Purpose: To create a set of lapsPerRep sized reps whose total sum
+#             does not exceed maxLaps comprising of permutations of lapSet.
+#
 def GenSymSet(lapsPerRep, maxLaps, lapSet)
   numReps = (maxLaps / lapsPerRep).floor
 
@@ -70,10 +89,17 @@ def GenSymSet(lapsPerRep, maxLaps, lapSet)
   return set
 end
 
-#THIS NEEDS TO BE TESTED
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: Increment   - Amount by which reps grow or shrink
+#            initialLaps - Starting number of laps
+#            maxLaps     - Maximum (or minimum) size of a rep
+#            lapSet      - The set of laps available for use in reps
+#
+# => Outputs: A set array containing the build set
+#
+# => Purpose: To build a set comprising of laps from lapSet that grows or
+#             shrinks at a constant rate (increment) until it hits the
+#             a specified limit (maxLaps).
+#
 def GenBuildSet(increment, initialLaps, maxLaps, lapSet)
   #Spec this out: (12/9/14) How do I specify how to assign from the lap set?
 
