@@ -7,8 +7,21 @@ $pool_lengths = {:scy => 25, :scm => 25, :lcm => 50}
 $pool_length = nil
 
 # => Inputs:
-# => Outputs:
+#
+# => Outputs: N/A
+#
 # => Purpose:
+#
+def InitTempoIntervals()
+end
+
+
+# => Inputs: focus - The command line argument for the session focus
+#
+# => Outputs: N/A
+#
+# => Purpose: To initialize the $focus varible
+#
 def InitLapSet(focus)
   if focus == "swim" or focus == "s"
   elsif focus == "drill" or focus == "d"
@@ -18,9 +31,12 @@ def InitLapSet(focus)
   end
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: length - The command line argument for the pool length.
+#
+# => Outputs: N/A
+#
+# => Purpose: To initialize the $pool_length variable.
+#
 def InitPoolLength(length)
   if length == "scy" or length == nil
     $pool_length = $pool_lengths[:scy]
@@ -31,34 +47,47 @@ def InitPoolLength(length)
   else
     #Undefined pool length, throw error and abort
   end
-
-  puts $pool_length
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: N/A
+#
+# => Outputs: The specified length of the pool.
+#
+# => Purpose: Provide a common interface to the pool length variable
+#
 def GetPoolLength
   return $pool_length
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: numLaps - The number of laps to be converted to distance.
+#
+# => Outputs: The distance equivalent to numlaps.
+#
+# => Purpose: Convert from laps to distance.
+#
 def LapsToLength(numLaps)
   return numLaps * GetPoolLength()
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: length - distance to be converted into number of laps
+#
+# => Outputs: The number of pool lengths equivalent to length.
+#
+# => Purpose: Convert from distance to laps
+#
 def LengthToLaps(length)
   return length / GetPoolLength()
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: N/A
+#
+# => Outputs: N/A
+#
+# => Purpose: This is the application orchestrator that gathers the program
+#             inputs and takes appropriate action to produce the requested
+#             program output. This should be called only once per application
+#             execution and should never be called by an outside program.
+#
 def InitEngine
   args = Hash[ ARGV.flat_map{|s| s.scan(/--?([^=\s]+)(?:=(\S+))?/) } ]
   InitPoolLength(args['pl'])
@@ -119,9 +148,14 @@ def GenBuildSet(increment, initialLaps, maxLaps, lapSet)
 
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: N/A
+#
+# => Outputs: A complete session.
+#
+# => Purpose: Create a fairly basic session. The session comprises of
+#             a warmup (500 free, 6 x 75 free/back), a main set (10 x 100 free,
+#             50->200 free in increments of 50), and a cool down (500 free)
+#
 def QuickSet
   fiveHundredFree = Array.new(20, $strokes[:free])
   basicWarmup = [fiveHundredFree]
@@ -140,9 +174,12 @@ def QuickSet
   return set
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
+# => Inputs: set - The set to be converted into a string.
+#
+# => Outputs: The resulting string
+#
+# => Purpose: Convert sets into strings for easy-to-read printing
+#
 def SetToString(set)
   setString = ""
   last_lap = nil
@@ -160,26 +197,29 @@ def SetToString(set)
   return setString
 end
 
-# => Inputs:
-# => Outputs:
-# => Purpose:
-def PrintSet(set)
+# => Inputs: session - The session to be printed.
+#
+# => Outputs: N/A
+#
+# => Purpose: Print the entire session in an aesthetic format.
+#
+def PrintSet(session)
   puts "Warm Up: "
-  set[:warmup].each do |warmupSet|
+  session[:warmup].each do |warmupSet|
     warmupSet.each do |subset|
       puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
   end
 
   puts "Main Set: "
-  set[:main].each do |mainSet|
+  session[:main].each do |mainSet|
     mainSet.each do |subset|
       puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
   end
 
   puts "Cool Down: "
-  set[:cooldown].each do |cooldownSet|
+  session[:cooldown].each do |cooldownSet|
     cooldownSet.each do |subset|
       puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
