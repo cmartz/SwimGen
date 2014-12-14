@@ -6,13 +6,23 @@ $strokes_lookup = $strokes.invert
 $pool_lengths = {:scy => 25, :scm => 25, :lcm => 50}
 $pool_length = nil
 
-# => Inputs:
+$flyTempoInt
+$backTempoInt
+$breastTempoInt
+$freeTempoInt
+
+# => Inputs:  freeTempo - The freestyle tempo interval for 100yds in seconds
 #
 # => Outputs: N/A
 #
-# => Purpose:
+# => Purpose: To initialize the tempo interval variables
 #
-def InitTempoIntervals()
+def InitTempoIntervals(freeTempo)
+  freeTempo = (freeTempo.to_i) / (100 / GetPoolLength())  # Scale to one lap.
+  $flyTempoInt    = (freeTempo * 1.17).ceil # 7/6 * freeTempo
+  $backTempoInt   = (freeTempo * 1.11).ceil # 10/9 * freeTempo
+  $breastTempoInt = (freeTempo * 1.33).ceil # 4/3 * freeTempo
+  $freeTempoInt   = freeTempo
 end
 
 
@@ -28,6 +38,7 @@ def InitLapSet(focus)
   elsif focus == "kick" or focus == "k"
   else
     #Undefined set focus, throw error and abort
+    abort("Invalid session focus")
   end
 end
 
@@ -46,6 +57,7 @@ def InitPoolLength(length)
     $pool_length = $pool_lengths[:lcm]
   else
     #Undefined pool length, throw error and abort
+    abort("Invalid pool format.")
   end
 end
 
@@ -92,6 +104,7 @@ def InitEngine
   args = Hash[ ARGV.flat_map{|s| s.scan(/--?([^=\s]+)(?:=(\S+))?/) } ]
   InitPoolLength(args['pl'])
   InitLapSet(args['f'])
+  InitTempoIntervals(args['fti'])
 end
 
 #########################################################################
