@@ -1,11 +1,14 @@
 class Lap
-{
 
-  def initialize(name,stroke,category,tempo_interval)
+
+  def initialize(name,stroke,category)
     @name = name
     @stroke = stroke
     @category = category
-    @tempo_interval = tempo_interval
   end
 
-}
+  def get_name
+    return @name
+  end
+
+end

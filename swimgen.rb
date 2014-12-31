@@ -1,4 +1,5 @@
-
+require "csv"
+require_relative "Lap.rb"
 
 $strokes = {:fly => 0, :back => 1, :breast => 2, :free => 3}
 $strokes_lookup = $strokes.invert
@@ -25,6 +26,25 @@ def InitTempoIntervals(freeTempo)
   $freeTempoInt   = freeTempo
 end
 
+# => Inputs: query  -
+#            source - The data source to query the lap set from
+#
+# => Outputs: The results of the lapset query
+#
+# => Purpose: To query a lap set from a specified data source
+#
+def GetLapSet(query, source)
+  if source == "TEST"
+    #Get lap set from test data csv
+    #Should this be made into a separate method?
+    CSV.foreach("test_data.csv") do |row|
+      #Add in case for empty rows
+      l = Lap.new(row[0].to_s, $strokes[row[1].to_s], row[2].to_s)
+    end
+  else
+    #Get lap set from database
+  end
+end
 
 # => Inputs: focus - The command line argument for the session focus
 #
@@ -34,6 +54,7 @@ end
 #
 def InitLapSet(focus)
   if focus == "swim" or focus == "s"
+    GetLapSet(focus, "TEST")
   elsif focus == "drill" or focus == "d"
   elsif focus == "kick" or focus == "k"
   else
@@ -245,3 +266,6 @@ InitEngine()
 set = QuickSet()
 
 PrintSet(set)
+
+l = Lap.new('Easy Free', $strokes[:free], 'swim')
+puts l.get_name
