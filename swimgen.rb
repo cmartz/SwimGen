@@ -19,12 +19,19 @@ $freeTempoInt
 # => Purpose: To initialize the tempo interval variables
 #
 def InitTempoIntervals(freeTempo)
+  if freeTempo == nil
+    abort("Invalid tempo interval")
+  end
+
   freeTempo = (freeTempo.to_i) / (100 / GetPoolLength())  # Scale to one lap.
   $flyTempoInt    = (freeTempo * 1.17).ceil # 7/6 * freeTempo
   $backTempoInt   = (freeTempo * 1.11).ceil # 10/9 * freeTempo
   $breastTempoInt = (freeTempo * 1.33).ceil # 4/3 * freeTempo
   $freeTempoInt   = freeTempo
 end
+
+$lapSet = {}
+$lapset_lookup = {}
 
 # => Inputs: query  -
 #            source - The data source to query the lap set from
@@ -40,6 +47,7 @@ def GetLapSet(query, source)
     CSV.foreach("test_data.csv") do |row|
       #Add in case for empty rows
       l = Lap.new(row[0].to_s, $strokes[row[1].to_s], row[2].to_s)
+      puts l.get_name
     end
   else
     #Get lap set from database
@@ -70,7 +78,7 @@ end
 # => Purpose: To initialize the $pool_length variable.
 #
 def InitPoolLength(length)
-  if length == "scy" or length == nil
+  if length == "scy" #or length == nil
     $pool_length = $pool_lengths[:scy]
   elsif length == "scm"
     $pool_length = $pool_lengths[:scm]
@@ -258,6 +266,10 @@ def PrintSet(session)
       puts "\t\t" + (subset.size * GetPoolLength()).to_s + ": " + SetToString(subset)
     end
   end
+end
+
+def GenHtml(session)
+  
 end
 
 #########################################################################

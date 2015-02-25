@@ -6,6 +6,10 @@ Overview
 
 Example Usage
 =============
+  1. ruby swimgen.rb -pl=scy -f=swim -fti=90
+     * pool length = short-course yards (25y)
+     * session focus = swim
+     * freestyle 100 tempo interval = 1:30 (90 seconds)
 
 Command Line Interface
 ======================
